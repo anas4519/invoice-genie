@@ -7,8 +7,8 @@ import 'package:invoice_scanner/constants/constants.dart';
 import 'package:lottie/lottie.dart';
 
 class ScanResult extends StatefulWidget {
-  const ScanResult({super.key, required this.imagePath});
-  final String imagePath;
+  const ScanResult({super.key, required this.images});
+  final List<String> images;
 
   @override
   State<ScanResult> createState() => _ScanResultState();
@@ -17,17 +17,31 @@ class ScanResult extends StatefulWidget {
 class _ScanResultState extends State<ScanResult> {
   bool isLoading = true;
   String body = '';
+  List<String> recognizedTexts = [];
 
-  Future<void> _extractText(File file) async {
+  Future<void> _extractText(List<String> _images) async {
     final textRecognizer = TextRecognizer(
       script: TextRecognitionScript.latin,
     );
 
-    final InputImage inputImage = InputImage.fromFile(file);
-    final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
-    await _aiAnalysis(recognizedText.text);
-    textRecognizer.close();
+    List<String> extractedTexts = [];
+    try {
+      for (String imagePath in _images) {
+        final inputImage = InputImage.fromFilePath(imagePath);
+        final recognizedText = await textRecognizer.processImage(inputImage);
+        extractedTexts.add(recognizedText.text);
+      }
+
+      textRecognizer.close();
+
+      // Process combined text for AI analysis
+      String combinedText = extractedTexts.join("\n");
+      await _aiAnalysis(combinedText);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _aiAnalysis(String text) async {
@@ -37,9 +51,9 @@ class _ScanResultState extends State<ScanResult> {
     );
 
     String prompt = '''
-    Given below is the text extracted from an Indian Tax Invoice, I need you to find thee following details from the text, if they do not exist or that field is empty, don't include it in the response. Respond in JSON format.
-    Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyer's Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods(Name, quantity, HSN, Amount),
-    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Applied Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B : True). Only include the informations asked, nothing else.
+    Given below is the text extracted from an Indian Tax Invoice. Extract the requested details in JSON format:
+    Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyer's Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods (Name, quantity, HSN, Amount),
+    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Applied Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B: True).
 
     $text
   ''';
@@ -61,32 +75,52 @@ class _ScanResultState extends State<ScanResult> {
 
   @override
   void initState() {
-    _extractText(File(widget.imagePath));
     super.initState();
+    _extractText(widget.images);
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('New Invoice'),
+        title: const Text('New Invoice'),
         actions: [
           IconButton(
-              onPressed: () {
-                _extractText(File(widget.imagePath));
-              },
-              icon: Icon(Icons.refresh))
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+              });
+              _extractText(widget.images);
+            },
+            icon: const Icon(Icons.refresh),
+          ),
         ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           children: [
-            Center(
-                child: Image.file(File(widget.imagePath), fit: BoxFit.cover)),
+            SizedBox(
+              height: screenHeight * 0.5,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.images.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
+                    child: Image.file(
+                      File(widget.images[index]),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              ),
+            ),
             SizedBox(height: screenHeight * 0.02),
             if (isLoading)
               Center(
@@ -98,9 +132,8 @@ class _ScanResultState extends State<ScanResult> {
                 ),
               )
             else
-              // GptMarkdown(body.substring(7, body.length - 4))
               ..._buildTextFieldsFromJson(body.substring(7, body.length - 4),
-                  screenWidth, context, screenHeight)
+                  screenWidth, context, screenHeight),
           ],
         ),
       ),
