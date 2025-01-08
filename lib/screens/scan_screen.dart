@@ -1,5 +1,6 @@
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_scanner/screens/pdf_scan_result.dart';
 import 'package:invoice_scanner/screens/scan_result.dart';
@@ -60,6 +61,7 @@ class _ScanScreenState extends State<ScanScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Scan Invoice'),
@@ -67,19 +69,59 @@ class _ScanScreenState extends State<ScanScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ElevatedButton.icon(
-              onPressed: _openScanner,
-              icon: const Icon(Icons.camera),
-              label: const Text('Camera'),
+            SizedBox(
+              height: screenHeight * 0.04,
             ),
-            ElevatedButton.icon(
-              onPressed: () => _pickPDF(context),
-              icon: const Icon(Icons.file_upload),
-              label: const Text('File'),
+            Image.asset(
+              'assets/images/Group 2@2x.png',
+              width: screenWidth * 0.85,
             ),
+            SizedBox(
+              height: screenHeight * 0.02,
+            ),
+            Center(
+                child: Text(
+              'Click one of the buttons to start scanning',
+              style: Theme.of(context).textTheme.headlineLarge,
+              textAlign: TextAlign.center,
+            )),
+            SizedBox(
+              height: screenHeight * 0.05,
+            ),
+            Padding(
+              padding: EdgeInsets.all(screenWidth * 0.04),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: _openScanner,
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: const EdgeInsets.all(24),
+                      elevation: 3
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.camera_fill,
+                      size: 50,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _pickPDF(context),
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: const EdgeInsets.all(24),
+                      elevation: 3
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.folder_fill,
+                      size: 50,
+                    ),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
