@@ -10,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String name = '';
   bool isLoading = true;
   List<Map<String, dynamic>> _invoices = [];
   final TextEditingController _searchController = TextEditingController();
@@ -18,7 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void updateList(String value) {
     setState(() {
       if (value.isEmpty) {
-        // Show all invoices if the search bar is cleared
         _initDbAndPrintInvoices();
       } else {
         _invoices = _invoices

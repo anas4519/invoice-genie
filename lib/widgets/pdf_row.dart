@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:open_filex/open_filex.dart';
 
@@ -21,7 +22,7 @@ class PDFRow extends StatelessWidget {
 
     return InkWell(
       onTap: () async {
-        // Open the PDF file
+        HapticFeedback.lightImpact();
         await OpenFilex.open(filePath);
       },
       child: Material(
@@ -73,6 +74,7 @@ class PDFRow extends StatelessWidget {
               Spacer(),
               IconButton(
                 onPressed: () async {
+                  HapticFeedback.lightImpact();
                   // Share the file using share_plus
                   await Share.shareXFiles(
                     [XFile(filePath)],
