@@ -4,6 +4,8 @@ import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:invoice_scanner/constants/constants.dart';
+import 'package:invoice_scanner/services/database_service.dart';
+import 'package:invoice_scanner/services/pdf_creator.dart';
 import 'package:lottie/lottie.dart';
 
 class ScanResult extends StatefulWidget {
@@ -18,6 +20,8 @@ class _ScanResultState extends State<ScanResult> {
   bool isLoading = true;
   String body = '';
   List<String> recognizedTexts = [];
+  bool isSubmitting = false;
+  late DataBaseService dataBaseService;
 
   Future<void> _extractText(List<String> _images) async {
     final textRecognizer = TextRecognizer(
@@ -53,7 +57,7 @@ class _ScanResultState extends State<ScanResult> {
     String prompt = '''
     Given below is the text extracted from an Indian Tax Invoice. Extract the requested details in JSON format:
     Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyer's Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods (Name, quantity, HSN, Amount),
-    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Applied Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B: True).
+    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B: True).
 
     $text
   ''';
@@ -73,10 +77,60 @@ class _ScanResultState extends State<ScanResult> {
     }
   }
 
+  Future<void> _saveInvoice() async {
+    setState(() {
+      isSubmitting = true;
+    });
+    try {
+      final pdfFile = await PdfCreator.createPdfFromImages(widget.images);
+      await _addInvoiceToDatabase(pdfFile.path);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  Future<void> _addInvoiceToDatabase(String filePath) async {
+    final invoiceData = jsonDecode(body.substring(7, body.length - 4));
+    final invoice = {
+      'invoice_num': invoiceData['Invoice number'],
+      'date': invoiceData['Date'],
+      'payment_mode': invoiceData['Payment Mode'],
+      'terms_of_delivery': invoiceData['Terms of Delivery'],
+      'buyers_name': invoiceData['Buyer\'s Name'],
+      'buyers_address': invoiceData['Buyer\'s Address'],
+      'buyers_telephone': invoiceData['Buyers Telephone'],
+      'buyers_gst_num': invoiceData['Buyers GST Number'],
+      'buyers_pan': invoiceData['Buyers PAN/IT. Number'],
+      'state_name': invoiceData['State Name'],
+      'goods_description': invoiceData['Description of Goods'].toString(),
+      'amount_before_gst': invoiceData['Amount before GST'],
+      'cgst': invoiceData['CGST'],
+      'sgst': invoiceData['SGST'],
+      'total_quantity': invoiceData['Total Quantity'],
+      'total_amount': invoiceData['Total Amount'],
+      'cgst_rate': invoiceData['CGST Rate'],
+      'sgst_rate': invoiceData['SGST Rate'],
+      'total_tax_amount': invoiceData['Total Tax Amount'],
+      'invoice_path': filePath,
+      'b2b': invoiceData['B2B'].toString().toLowerCase() == 'false' ? 0 : 1
+    };
+
+    await dataBaseService.insertInvoice(invoice);
+    setState(() {
+      isSubmitting = false;
+    });
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Invoice Saved Successfully')));
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     super.initState();
     _extractText(widget.images);
+    dataBaseService = DataBaseService();
   }
 
   @override
@@ -132,8 +186,30 @@ class _ScanResultState extends State<ScanResult> {
                 ),
               )
             else
-              ..._buildTextFieldsFromJson(body.substring(7, body.length - 4),
-                  screenWidth, context, screenHeight),
+              Column(
+                children: [
+                  ..._buildTextFieldsFromJson(
+                      body.substring(7, body.length - 4),
+                      screenWidth,
+                      context,
+                      screenHeight),
+                  ElevatedButton(
+                    onPressed: _saveInvoice,
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(screenWidth * 0.02))),
+                    child: Padding(
+                        padding: EdgeInsets.all(screenWidth * 0.04),
+                        child: isSubmitting
+                            ? CircularProgressIndicator()
+                            : Text(
+                                'Add Invoice',
+                                style: TextStyle(fontSize: 18),
+                              )),
+                  ),
+                ],
+              )
           ],
         ),
       ),

@@ -36,8 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   google_nav_bar: ^5.0.7
-  image_picker: ^1.1.2
-  image_cropper: ^8.1.0
   google_mlkit_text_recognition: ^0.14.0
   lottie: ^3.3.0
   google_generative_ai: ^0.4.6
@@ -52,6 +50,8 @@ dependencies:
   path: ^1.9.0
   pdf_render: ^1.4.12
   cunning_document_scanner: ^1.2.3
+  pdf: ^3.11.1
+
 
 dev_dependencies:
   flutter_test:

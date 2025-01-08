@@ -46,11 +46,12 @@ class _ScanScreenState extends State<ScanScreen> {
           [];
       if (!mounted) return;
       _pictures = pictures;
-      if (_pictures.isNotEmpty)
+      if (_pictures.isNotEmpty) {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (ctx) => ScanResult(
                   images: _pictures,
                 )));
+      }
     } catch (exception) {
       // Handle exception here
     }

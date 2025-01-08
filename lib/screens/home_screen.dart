@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:invoice_scanner/widgets/pdf_thumbnail.dart';
 import 'package:invoice_scanner/services/database_service.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Database _database;
   String name = '';
   bool isLoading = true;
   @override
@@ -25,10 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _initDbAndPrintInvoices() async {
     final dbService = DataBaseService();
     final invoices = await dbService.getInvoices();
-    setState(() {
-      name = invoices[0]['invoice_path'];
-      isLoading = false;
-    });
+    print(invoices[0]['goods_description']);
   }
 
   @override
@@ -39,9 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
           centerTitle: true,
         ),
         body: Center(
-          child: isLoading
-              ? CircularProgressIndicator()
-              : PDFThumbnail(pdfPath: name),
+          child: Text('Hello'),
         ));
   }
 }
