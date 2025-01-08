@@ -74,7 +74,24 @@ class _B2bScreenState extends State<B2bScreen> {
         body: Center(
           child: isLoading
               ? CircularProgressIndicator()
-              : Column(
+              : _invoices.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/images/undraw_factory_4d61-removebg-preview.png', width: screenWidth*0.85,),
+                          SizedBox(height: screenHeight*0.02,),
+                          Text('You have not added any B2B invoices yet.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18))
+                        ],
+                      ),
+                    )
+                  : 
+              Column(
                   children: [
                     Padding(
                       padding: EdgeInsets.all(screenWidth * 0.04),

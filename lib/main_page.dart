@@ -58,7 +58,7 @@ class _MainPageState extends State<MainPage> {
                 icon: CupertinoIcons.home,
                 text: 'Home',
               ),
-              GButton(icon: Icons.document_scanner_outlined, text: 'Scan'),
+              GButton(icon: Icons.document_scanner_rounded, text: 'Scan',),
               GButton(
                 icon: CupertinoIcons.group_solid,
                 text: 'B2C',

@@ -70,54 +70,65 @@ class _ScanScreenState extends State<ScanScreen> {
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               height: screenHeight * 0.04,
             ),
             Image.asset(
-              'assets/images/Group 2@2x.png',
-              width: screenWidth * 0.85,
+              'assets/images/undraw_my-files_yynz-removebg-preview.png',
+              // width: screenWidth * 0.75,
             ),
             SizedBox(
-              height: screenHeight * 0.02,
+              height: screenHeight * 0.04,
             ),
             Center(
                 child: Text(
-              'Click one of the buttons to start scanning',
-              style: Theme.of(context).textTheme.headlineLarge,
+              'Click one of the buttons to start scanning!',
+              style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             )),
             SizedBox(
-              height: screenHeight * 0.05,
+              height: screenHeight * 0.1,
             ),
             Padding(
               padding: EdgeInsets.all(screenWidth * 0.04),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: _openScanner,
-                    style: ElevatedButton.styleFrom(
-                      shape: CircleBorder(),
-                      padding: const EdgeInsets.all(24),
-                      elevation: 3
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.camera_fill,
-                      size: 50,
-                    ),
+                  Column(
+                    spacing: screenHeight*0.01,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _openScanner,
+                        style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: const EdgeInsets.all(24),
+                            elevation: 3),
+                        child: const Icon(
+                          CupertinoIcons.camera_fill,
+                          size: 50,
+                        ),
+                      ),
+                      Text('Click/Upload Image', style: Theme.of(context).textTheme.bodySmall,)
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () => _pickPDF(context),
-                    style: ElevatedButton.styleFrom(
-                      shape: CircleBorder(),
-                      padding: const EdgeInsets.all(24),
-                      elevation: 3
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.folder_fill,
-                      size: 50,
-                    ),
+                  Column(
+                    spacing: screenHeight*0.01,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _pickPDF(context),
+                        style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: const EdgeInsets.all(24),
+                            elevation: 3),
+                        child: const Icon(
+                          CupertinoIcons.folder_fill,
+                          size: 50,
+                        ),
+                      ),
+                      Text('Upload File', style: Theme.of(context).textTheme.bodySmall,)
+                    ],
                   ),
                 ],
               ),
