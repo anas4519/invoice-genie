@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:invoice_scanner/services/database_service.dart';
 import 'package:invoice_scanner/widgets/digital_invoice_row.dart';
 
@@ -79,12 +80,13 @@ class _B2bScreenState extends State<B2bScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/undraw_factory_4d61-removebg-preview.png',
-                            width: screenWidth * 0.85,
+                          SvgPicture.asset(
+                            'assets/images/b2bimage.svg',
+                            fit: BoxFit.contain,
+                            width: 350,
                           ),
                           SizedBox(
-                            height: screenHeight * 0.02,
+                            height: screenHeight * 0.03,
                           ),
                           Text('You have not added any B2B invoices yet.',
                               textAlign: TextAlign.center,

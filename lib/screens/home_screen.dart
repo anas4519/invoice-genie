@@ -135,7 +135,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenHeight * 0.04),
+                        Padding(
+                          padding: EdgeInsets.only(left: screenWidth*0.04),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Recently Scanned',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight*0.01,),
                         Expanded(
                           child: ListView.builder(
                             itemCount: displayList.length,

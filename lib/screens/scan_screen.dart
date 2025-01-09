@@ -2,6 +2,7 @@ import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:invoice_scanner/screens/pdf_scan_result.dart';
 import 'package:invoice_scanner/screens/scan_result.dart';
 
@@ -75,9 +76,13 @@ class _ScanScreenState extends State<ScanScreen> {
             SizedBox(
               height: screenHeight * 0.04,
             ),
-            Image.asset(
-              'assets/images/undraw_my-files_yynz-removebg-preview.png',
-              // width: screenWidth * 0.75,
+            Center(
+              child: SvgPicture.asset(
+                'assets/images/scanScreen.svg',
+                fit: BoxFit.contain,
+                height: 200,
+                width: 200,
+              ),
             ),
             SizedBox(
               height: screenHeight * 0.04,
@@ -97,7 +102,7 @@ class _ScanScreenState extends State<ScanScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
-                    spacing: screenHeight*0.01,
+                    spacing: screenHeight * 0.01,
                     children: [
                       ElevatedButton(
                         onPressed: _openScanner,
@@ -110,11 +115,14 @@ class _ScanScreenState extends State<ScanScreen> {
                           size: 50,
                         ),
                       ),
-                      Text('Click/Upload Image', style: Theme.of(context).textTheme.bodySmall,)
+                      Text(
+                        'Click/Upload Image',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
                     ],
                   ),
                   Column(
-                    spacing: screenHeight*0.01,
+                    spacing: screenHeight * 0.01,
                     children: [
                       ElevatedButton(
                         onPressed: () => _pickPDF(context),
@@ -127,7 +135,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           size: 50,
                         ),
                       ),
-                      Text('Upload File', style: Theme.of(context).textTheme.bodySmall,)
+                      Text(
+                        'Upload File',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
                     ],
                   ),
                 ],

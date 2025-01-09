@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:invoice_scanner/screens/digital_invoice.dart';
 import 'package:invoice_scanner/services/database_service.dart';
 import 'package:invoice_scanner/widgets/digital_invoice_row.dart';
@@ -56,7 +57,7 @@ class _B2CScreenState extends State<B2CScreen> {
     var invoices = await dbService.getInvoices();
     invoices = invoices.where((invoice) => invoice['b2b'] == 0).toList();
     setState(() {
-      _invoices = invoices;
+      // _invoices = invoices;
       isLoading = false;
     });
   }
@@ -78,9 +79,10 @@ class _B2CScreenState extends State<B2CScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                              'assets/images/undraw_shopping-bags_nfsf-removebg-preview.png',
-                              width: screenWidth * 0.85),
+                          SvgPicture.asset('assets/images/b2cimage.svg', fit: BoxFit.contain,
+                          width: 250,
+                          height: 250,
+                          ),
                           SizedBox(
                             height: screenHeight * 0.02,
                           ),
