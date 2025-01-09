@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:invoice_scanner/constants/constants.dart';
+import 'package:invoice_scanner/main_page.dart';
 import 'package:invoice_scanner/services/database_service.dart';
 import 'package:invoice_scanner/services/pdf_creator.dart';
 import 'package:lottie/lottie.dart';
@@ -110,6 +111,7 @@ class _ScanResultState extends State<ScanResult> {
 
   Future<void> _addInvoiceToDatabase(String filePath) async {
     final invoiceData = jsonDecode(body.substring(7, body.length - 4));
+    final s = getGoodsDescription(invoiceData);
     final invoice = {
       'invoice_num': invoiceData['Invoice number'],
       'date': invoiceData['Date'],
@@ -121,9 +123,7 @@ class _ScanResultState extends State<ScanResult> {
       'buyers_gst_num': invoiceData['Buyer\'s GST Number'],
       'buyers_pan': invoiceData['Buyer\'s PAN/IT. Number'],
       'state_name': invoiceData['State Name'],
-      'goods_description': getGoodsDescription(invoiceData).isEmpty
-          ? null
-          : getGoodsDescription(invoiceData),
+      'goods_description': s.substring(1, s.length - 1),
       'amount_before_gst': invoiceData['Amount before GST'],
       'cgst': invoiceData['CGST'],
       'sgst': invoiceData['SGST'],
@@ -142,7 +142,11 @@ class _ScanResultState extends State<ScanResult> {
     });
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('Invoice Saved Successfully')));
-    Navigator.pop(context);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => MainPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override

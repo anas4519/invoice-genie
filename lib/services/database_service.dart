@@ -53,7 +53,7 @@ class DataBaseService {
             $_invoicePath TEXT NOT NULL,
             $_invoiceNum TEXT NOT NULL,
             $_date TEXT NOT NULL,
-            $_paymentMode TEXT NOT NULL,
+            $_paymentMode TEXT,
             $_termsOfDelivery TEXT NOT NULL,
             $_buyersName TEXT NOT NULL,
             $_buyersAddress TEXT,

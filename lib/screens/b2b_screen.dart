@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:invoice_scanner/screens/digital_invoice.dart';
 import 'package:invoice_scanner/services/database_service.dart';
-import 'package:invoice_scanner/widgets/pdf_row.dart';
+import 'package:invoice_scanner/widgets/digital_invoice_row.dart';
 
 class B2bScreen extends StatefulWidget {
   const B2bScreen({super.key});
@@ -123,7 +122,7 @@ class _B2bScreenState extends State<B2bScreen> {
                                         TextCapitalization.sentences,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
-                                      hintText: 'Search an invoice',
+                                      hintText: 'Search',
                                     ),
                                   ),
                                 ),
@@ -139,24 +138,9 @@ class _B2bScreenState extends State<B2bScreen> {
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (ctx) =>
-                                                    DigitalInvoice(
-                                                        invoice:
-                                                            _invoices[index])));
-                                      },
-                                      child: Text(
-                                          _invoices[index]['invoice_num'])),
-                                  // PDFRow(
-                                  //     invoiceNum: _invoices[index]['invoice_num'],
-                                  //     filePath: _invoices[index]['invoice_path'],
-                                  //     date: _invoices[index]['date']),
-                                  SizedBox(
-                                    height: screenHeight * 0.01,
-                                  )
+                                  DigitalInvoiceRow(
+                                    invoice: _invoices[index],
+                                  ),
                                 ],
                               );
                             },
