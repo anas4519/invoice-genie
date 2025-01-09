@@ -66,6 +66,7 @@ class _ScanResultState extends State<ScanResult> {
 
     try {
       final result = await model.generateContent(content);
+      print(result);
       setState(() {
         isLoading = false;
         body = result.text!;
@@ -91,6 +92,22 @@ class _ScanResultState extends State<ScanResult> {
     }
   }
 
+  String getGoodsDescription(Map<String, dynamic> data) {
+    if (data.containsKey('Description of Goods')) {
+      return data['Description of Goods'].toString();
+    } else if (data
+        .containsKey('Description of Goods(Name, quantity, HSN, Amount)')) {
+      return data['Description of Goods(Name, quantity, HSN, Amount)']
+          .toString();
+    } else if (data
+        .containsKey('Description of Goods(Name, Quantity, HSN, Amount)')) {
+      return data['Description of Goods(Name, Quantity, HSN, Amount)']
+          .toString();
+    } else {
+      return ''; // Default value if none of the keys exist
+    }
+  }
+
   Future<void> _addInvoiceToDatabase(String filePath) async {
     final invoiceData = jsonDecode(body.substring(7, body.length - 4));
     final invoice = {
@@ -100,11 +117,13 @@ class _ScanResultState extends State<ScanResult> {
       'terms_of_delivery': invoiceData['Terms of Delivery'],
       'buyers_name': invoiceData['Buyer\'s Name'],
       'buyers_address': invoiceData['Buyer\'s Address'],
-      'buyers_telephone': invoiceData['Buyers Telephone'],
-      'buyers_gst_num': invoiceData['Buyers GST Number'],
-      'buyers_pan': invoiceData['Buyers PAN/IT. Number'],
+      'buyers_telephone': invoiceData['Buyer\'s Telephone'],
+      'buyers_gst_num': invoiceData['Buyer\'s GST Number'],
+      'buyers_pan': invoiceData['Buyer\'s PAN/IT. Number'],
       'state_name': invoiceData['State Name'],
-      'goods_description': invoiceData['Description of Goods'].toString(),
+      'goods_description': getGoodsDescription(invoiceData).isEmpty
+          ? null
+          : getGoodsDescription(invoiceData),
       'amount_before_gst': invoiceData['Amount before GST'],
       'cgst': invoiceData['CGST'],
       'sgst': invoiceData['SGST'],

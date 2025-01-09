@@ -70,7 +70,7 @@ class _PdfScanResultState extends State<PdfScanResult> {
 
     String prompt = '''
     Given below is the text extracted from an Indian Tax Invoice, I need you to find thee following details from the text, if they do not exist or that field is empty, don't include it in the response. Respond in JSON format.
-    Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyers Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods(Name, quantity, HSN, Amount),
+    Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyer's Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods(Name, quantity, HSN, Amount),
     Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B : True). Only include the informations asked, nothing else.
 
     $text
@@ -80,6 +80,7 @@ class _PdfScanResultState extends State<PdfScanResult> {
 
     try {
       final result = await model.generateContent(content);
+      print(result.text);
       setState(() {
         isAiLoading = false;
         body = result.text!;
@@ -107,6 +108,22 @@ class _PdfScanResultState extends State<PdfScanResult> {
     }
   }
 
+  String getGoodsDescription(Map<String, dynamic> data) {
+    if (data.containsKey('Description of Goods')) {
+      return data['Description of Goods'].toString();
+    } else if (data
+        .containsKey('Description of Goods(Name, quantity, HSN, Amount)')) {
+      return data['Description of Goods(Name, quantity, HSN, Amount)']
+          .toString();
+    } else if (data
+        .containsKey('Description of Goods(Name, Quantity, HSN, Amount)')) {
+      return data['Description of Goods(Name, Quantity, HSN, Amount)']
+          .toString();
+    } else {
+      return ''; // Default value if none of the keys exist
+    }
+  }
+
   Future<void> _addInvoiceToDatabase(String filePath) async {
     final invoiceData = jsonDecode(body.substring(7, body.length - 4));
     final invoice = {
@@ -116,11 +133,13 @@ class _PdfScanResultState extends State<PdfScanResult> {
       'terms_of_delivery': invoiceData['Terms of Delivery'],
       'buyers_name': invoiceData['Buyer\'s Name'],
       'buyers_address': invoiceData['Buyer\'s Address'],
-      'buyers_telephone': invoiceData['Buyers Telephone'],
-      'buyers_gst_num': invoiceData['Buyers GST Number'],
-      'buyers_pan': invoiceData['Buyers PAN/IT. Number'],
+      'buyers_telephone': invoiceData['Buyer\'s Telephone'],
+      'buyers_gst_num': invoiceData['Buyer\'s GST Number'],
+      'buyers_pan': invoiceData['Buyer\'s PAN/IT. Number'],
       'state_name': invoiceData['State Name'],
-      'goods_description': invoiceData['Description of Goods'].toString(),
+      'goods_description': getGoodsDescription(invoiceData).isEmpty
+          ? null
+          : getGoodsDescription(invoiceData),
       'amount_before_gst': invoiceData['Amount before GST'],
       'cgst': invoiceData['CGST'],
       'sgst': invoiceData['SGST'],
@@ -130,7 +149,7 @@ class _PdfScanResultState extends State<PdfScanResult> {
       'sgst_rate': invoiceData['SGST Rate'],
       'total_tax_amount': invoiceData['Total Tax Amount'],
       'invoice_path': filePath,
-      'b2b' : invoiceData['B2B'].toString().toLowerCase() == 'false'? 0:1
+      'b2b': invoiceData['B2B'].toString().toLowerCase() == 'false' ? 0 : 1
     };
 
     await dataBaseService.insertInvoice(invoice);
@@ -264,8 +283,7 @@ List<Widget> _buildTextFieldsFromJson(String jsonResponse, double screenWidth,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
-                _buildTextField(
-                    'Good\'s Name', item['Name'] ?? '', screenWidth),
+                _buildTextField('Item Name', item['Name'] ?? '', screenWidth),
                 _buildTextField('Quantity', item['quantity']?.toString() ?? '',
                     screenWidth),
                 _buildTextField(

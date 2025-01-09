@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_scanner/screens/digital_invoice.dart';
 import 'package:invoice_scanner/services/database_service.dart';
 import 'package:invoice_scanner/widgets/pdf_row.dart';
 
@@ -79,8 +80,13 @@ class _B2bScreenState extends State<B2bScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/images/undraw_factory_4d61-removebg-preview.png', width: screenWidth*0.85,),
-                          SizedBox(height: screenHeight*0.02,),
+                          Image.asset(
+                            'assets/images/undraw_factory_4d61-removebg-preview.png',
+                            width: screenWidth * 0.85,
+                          ),
+                          SizedBox(
+                            height: screenHeight * 0.02,
+                          ),
                           Text('You have not added any B2B invoices yet.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -90,63 +96,74 @@ class _B2bScreenState extends State<B2bScreen> {
                         ],
                       ),
                     )
-                  : 
-              Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(screenWidth * 0.04),
-                      child: Container(
-                        height: screenHeight * 0.07,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.03),
-                          border: Border.all(color: Colors.blue, width: 1.5),
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 12),
-                            const Icon(Icons.search_rounded,
-                                color: Colors.blue),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                onChanged: (value) => updateList(value),
-                                controller: _searchController,
-                                keyboardType: TextInputType.text,
-                                textCapitalization:
-                                    TextCapitalization.sentences,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: 'Search an invoice',
-                                ),
-                              ),
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(screenWidth * 0.04),
+                          child: Container(
+                            height: screenHeight * 0.07,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.03),
+                              border:
+                                  Border.all(color: Colors.blue, width: 1.5),
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 12),
+                                const Icon(Icons.search_rounded,
+                                    color: Colors.blue),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: TextField(
+                                    onChanged: (value) => updateList(value),
+                                    controller: _searchController,
+                                    keyboardType: TextInputType.text,
+                                    textCapitalization:
+                                        TextCapitalization.sentences,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Search an invoice',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        SizedBox(height: screenHeight * 0.04),
+                        // PDFRow(date: _invoices[0]['date'], filePath: _invoices[0]['invoice_path'], invoiceNum: _invoices[0]['invoice_num'],)
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _invoices.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    DigitalInvoice(
+                                                        invoice:
+                                                            _invoices[index])));
+                                      },
+                                      child: Text(
+                                          _invoices[index]['invoice_num'])),
+                                  // PDFRow(
+                                  //     invoiceNum: _invoices[index]['invoice_num'],
+                                  //     filePath: _invoices[index]['invoice_path'],
+                                  //     date: _invoices[index]['date']),
+                                  SizedBox(
+                                    height: screenHeight * 0.01,
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: screenHeight * 0.04),
-                    // PDFRow(date: _invoices[0]['date'], filePath: _invoices[0]['invoice_path'], invoiceNum: _invoices[0]['invoice_num'],)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: _invoices.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              PDFRow(
-                                  invoiceNum: _invoices[index]['invoice_num'],
-                                  filePath: _invoices[index]['invoice_path'],
-                                  date: _invoices[index]['date']),
-                              SizedBox(
-                                height: screenHeight * 0.01,
-                              )
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
         ));
   }
 }

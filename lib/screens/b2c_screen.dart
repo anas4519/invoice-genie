@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:invoice_scanner/screens/digital_invoice.dart';
 import 'package:invoice_scanner/services/database_service.dart';
 import 'package:invoice_scanner/widgets/pdf_row.dart';
 
@@ -76,8 +77,12 @@ class _B2CScreenState extends State<B2CScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/images/undraw_shopping-bags_nfsf-removebg-preview.png', width: screenWidth*0.85),
-                          SizedBox(height: screenHeight*0.02,),
+                          Image.asset(
+                              'assets/images/undraw_shopping-bags_nfsf-removebg-preview.png',
+                              width: screenWidth * 0.85),
+                          SizedBox(
+                            height: screenHeight * 0.02,
+                          ),
                           Text('You have not added any B2C invoices yet.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -130,12 +135,23 @@ class _B2CScreenState extends State<B2CScreen> {
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
-                                  PDFRow(
-                                      invoiceNum: _invoices[index]
-                                          ['invoice_num'],
-                                      filePath: _invoices[index]
-                                          ['invoice_path'],
-                                      date: _invoices[index]['date']),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (ctx) =>
+                                                    DigitalInvoice(
+                                                        invoice:
+                                                            _invoices[index])));
+                                      },
+                                      child: Text(
+                                          _invoices[index]['invoice_num'])),
+                                  // PDFRow(
+                                  //     invoiceNum: _invoices[index]
+                                  //         ['invoice_num'],
+                                  //     filePath: _invoices[index]
+                                  //         ['invoice_path'],
+                                  //     date: _invoices[index]['date']),
                                   SizedBox(
                                     height: screenHeight * 0.01,
                                   )
