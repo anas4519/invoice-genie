@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart'; 
+import 'package:google_fonts/google_fonts.dart';
 import 'package:invoice_scanner/main_page.dart';
+import 'package:invoice_scanner/screens/onboarding_screen1.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isFirstTime = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFirstTime();
+  }
+
+  Future<void> _checkIfFirstTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? firstTime = prefs.getBool('first_time');
+
+    if (firstTime == null || firstTime) {
+      setState(() {
+        isFirstTime = true;
+      });
+      await prefs.setBool('first_time', false);
+    } else {
+      setState(() {
+        isFirstTime = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -48,7 +78,8 @@ class MyApp extends StatelessWidget {
         // )
       ),
       themeMode: ThemeMode.system,
-      home: const MainPage(),
+      // home: const MainPage(),
+      home: isFirstTime ? OnboardingScreen1() : MainPage(),
     );
   }
 }

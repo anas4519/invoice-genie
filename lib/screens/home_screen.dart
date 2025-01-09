@@ -66,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Scanned Invoices'),
+          automaticallyImplyLeading: false,
           centerTitle: true,
         ),
         body: Center(
