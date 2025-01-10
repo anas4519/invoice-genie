@@ -2,6 +2,7 @@ import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:invoice_scanner/screens/pdf_scan_result.dart';
 import 'package:invoice_scanner/screens/scan_result.dart';
@@ -17,19 +18,16 @@ class _ScanScreenState extends State<ScanScreen> {
   List<String> _pictures = [];
 
   Future<void> _pickPDF(BuildContext context) async {
-    // Open file picker and allow only PDF files
+    HapticFeedback.mediumImpact();
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
     );
 
-    // If a file is selected
     if (result != null) {
-      // Get the file path
       String? filePath = result.files.single.path;
 
       if (filePath != null) {
-        // Navigate to the PDF preview screen
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -41,6 +39,7 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   void _openScanner() async {
+    HapticFeedback.mediumImpact();
     List<String> pictures;
     try {
       pictures = await CunningDocumentScanner.getPictures(

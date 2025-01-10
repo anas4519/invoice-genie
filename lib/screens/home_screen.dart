@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final invoices = await dbService.getInvoices();
     setState(() {
       _invoices = invoices;
-      displayList = List.from(_invoices);
+      displayList = List.from(_invoices.reversed);
       isLoading = false;
     });
   }

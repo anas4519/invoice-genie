@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:invoice_scanner/screens/digital_invoice.dart';
 
@@ -78,6 +79,7 @@ class DigitalInvoiceRow extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (ctx) => DigitalInvoice(invoice: invoice),

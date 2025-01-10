@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
         // )
       ),
       themeMode: ThemeMode.system,
-      // home: const MainPage(),
+      // home: const OnboardingScreen1(),
       home: isFirstTime ? OnboardingScreen1() : MainPage(),
     );
   }

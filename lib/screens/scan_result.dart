@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:invoice_scanner/constants/constants.dart';
 import 'package:invoice_scanner/main_page.dart';
 import 'package:invoice_scanner/services/database_service.dart';
@@ -51,14 +52,14 @@ class _ScanResultState extends State<ScanResult> {
 
   Future<void> _aiAnalysis(String text) async {
     final model = gemini.GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash-exp',
       apiKey: GEMINI_API_KEY,
     );
 
     String prompt = '''
     Given below is the text extracted from an Indian Tax Invoice. Extract the requested details in JSON format:
     Invoice number, Date, Payment Mode, Terms of Delivery, Buyer's Name, Buyer's Address, Buyer's Telephone, Buyer's GST Number, Buyer's PAN/IT. Number, State Name, Description of Goods (Name, quantity, HSN, Amount),
-    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B: True).
+    Amount before GST, CGST, SGST, Total Quantity, Total Amount, CGST Rate, SGST Rate, Total Tax Amount. B2B true/false (if GST number exists for buyer, B2B: True). In the last key (Feedback), give a string that contains information on whether the total tax rates applied (CGST+SGST) for the given HSN numbers are correct.
 
     $text
   ''';
@@ -238,82 +239,89 @@ class _ScanResultState extends State<ScanResult> {
       ),
     );
   }
-}
 
-Widget _buildTextField(String label, String value, double screenWidth) {
-  return Padding(
-    padding: EdgeInsets.only(bottom: screenWidth * 0.02),
-    child: TextField(
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(screenWidth * 0.02),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(screenWidth * 0.02),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(screenWidth * 0.02),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-      ),
-      controller: TextEditingController(text: value),
-    ),
-  );
-}
-
-List<Widget> _buildTextFieldsFromJson(String jsonResponse, double screenWidth,
-    BuildContext context, double screenHeight) {
-  final Map<String, dynamic> data = jsonDecode(jsonResponse);
-  List<Widget> widgets = [];
-  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-  data.forEach((key, value) {
-    if (key.contains('Description of Goods') && value is List) {
-      for (var item in value) {
-        widgets.add(
-          Container(
-            padding: EdgeInsets.all(screenWidth * 0.02),
-            margin: EdgeInsets.only(bottom: screenHeight * 0.02),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(screenWidth * 0.02),
-              border: Border.all(
-                  color: isDarkMode ? Colors.grey[200]! : Colors.black,
-                  width: 1),
-            ),
-            child: Column(
-              spacing: screenHeight * 0.02,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Item',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
-                _buildTextField(
-                    'Good\'s Name', item['Name'] ?? '', screenWidth),
-                _buildTextField('Quantity', item['quantity']?.toString() ?? '',
-                    screenWidth),
-                _buildTextField(
-                    'HSN', item['HSN']?.toString() ?? '', screenWidth),
-                _buildTextField(
-                    'Amount', item['Amount']?.toString() ?? '', screenWidth),
-              ],
-            ),
+  Widget _buildTextField(String label, String value, double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: screenWidth * 0.02),
+      child: TextField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            borderSide: BorderSide(color: Colors.blue),
           ),
-        );
-        widgets.add(SizedBox(
-          height: screenHeight * 0.02,
-        ));
-      }
-    } else if (value != null) {
-      widgets.add(_buildTextField(key, value.toString(), screenWidth));
-      widgets.add(SizedBox(height: screenHeight * 0.02));
-    }
-  });
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+        ),
+        controller: TextEditingController(text: value),
+      ),
+    );
+  }
 
-  return widgets;
+  List<Widget> _buildTextFieldsFromJson(String jsonResponse, double screenWidth,
+      BuildContext context, double screenHeight) {
+    final Map<String, dynamic> data = jsonDecode(jsonResponse);
+    List<Widget> widgets = [];
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    data.forEach((key, value) {
+      if (key.contains('Feedback')) {
+        widgets.insert(0, GptMarkdown(value.toString()));
+        widgets.insert(
+            1,
+            SizedBox(
+              height: screenHeight * 0.04,
+            ));
+      } else if (key.contains('Description of Goods') && value is List) {
+        for (var item in value) {
+          widgets.add(
+            Container(
+              padding: EdgeInsets.all(screenWidth * 0.02),
+              margin: EdgeInsets.only(bottom: screenHeight * 0.02),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(screenWidth * 0.02),
+                border: Border.all(
+                    color: isDarkMode ? Colors.grey[200]! : Colors.black,
+                    width: 1),
+              ),
+              child: Column(
+                spacing: screenHeight * 0.02,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'Item',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  _buildTextField(
+                      'Good\'s Name', item['Name'] ?? '', screenWidth),
+                  _buildTextField('Quantity',
+                      item['quantity']?.toString() ?? '', screenWidth),
+                  _buildTextField(
+                      'HSN', item['HSN']?.toString() ?? '', screenWidth),
+                  _buildTextField(
+                      'Amount', item['Amount']?.toString() ?? '', screenWidth),
+                ],
+              ),
+            ),
+          );
+          widgets.add(SizedBox(
+            height: screenHeight * 0.02,
+          ));
+        }
+      } else if (value != null) {
+        widgets.add(_buildTextField(key, value.toString(), screenWidth));
+        widgets.add(SizedBox(height: screenHeight * 0.02));
+      }
+    });
+
+    return widgets;
+  }
 }

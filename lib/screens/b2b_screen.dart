@@ -13,6 +13,7 @@ class B2bScreen extends StatefulWidget {
 class _B2bScreenState extends State<B2bScreen> {
   bool isLoading = true;
   List<Map<String, dynamic>> _invoices = [];
+  List<Map<String, dynamic>> displayList = [];
   final TextEditingController _searchController = TextEditingController();
 
   void updateList(String value) {
@@ -20,7 +21,7 @@ class _B2bScreenState extends State<B2bScreen> {
       if (value.isEmpty) {
         _initDbAndPrintInvoices();
       } else {
-        _invoices = _invoices
+        displayList = displayList
             .where((invoice) =>
                 invoice['invoice_num']
                     .toString()
@@ -59,6 +60,7 @@ class _B2bScreenState extends State<B2bScreen> {
     invoices = invoices.where((invoice) => invoice['b2b'] == 1).toList();
     setState(() {
       _invoices = invoices;
+      displayList = List.from(_invoices.reversed);
       isLoading = false;
     });
   }
@@ -136,12 +138,12 @@ class _B2bScreenState extends State<B2bScreen> {
                         // PDFRow(date: _invoices[0]['date'], filePath: _invoices[0]['invoice_path'], invoiceNum: _invoices[0]['invoice_num'],)
                         Expanded(
                           child: ListView.builder(
-                            itemCount: _invoices.length,
+                            itemCount: displayList.length,
                             itemBuilder: (context, index) {
                               return Column(
                                 children: [
                                   DigitalInvoiceRow(
-                                    invoice: _invoices[index],
+                                    invoice: displayList[index],
                                   ),
                                 ],
                               );
